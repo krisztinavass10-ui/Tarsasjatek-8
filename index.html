@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Társasjáték</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1 style="text-align:center;">Társasjáték kérdések</h1>
+
+    <div id="category-container" style="text-align:center;">
+        <button class="category-btn main-category" onclick="chooseCategory('felelsz')">Felelsz</button>
+        <button class="category-btn main-category" onclick="chooseCategory('merszek')">Mersz</button>
+        <button class="category-btn main-category" onclick="chooseCategory('csokhazassag')">Csók/Házasság/Halál</button>
+        <button class="category-btn main-category" onclick="chooseCategory('mostlikely')">Most Likely To</button>
+        <button class="category-btn main-category" onclick="chooseCategory('inkabb')">Inkább</button>
+        <button class="category-btn main-category" onclick="chooseCategory('mutasdmeg')">Mutasd meg az utolsót</button>
+        <button class="category-btn main-category" onclick="showTortenelemLocations()">Történelem</button>
+    </div>
+
+    <div id="difficulty-container" style="text-align:center; margin-top:15px;"></div>
+    <div id="questions-container" style="display:flex; justify-content:center; flex-wrap:wrap;"></div>
+
+     <script>
+        const cardImageNames = [
+            "3beadf0e5bd8e6bbaadc49e93e543ca8.jpg",
+            "4c75a627840fa3cf1c714454fcf4e173.jpg",
+            "023f41abf90d523b5341ea6dc1177533.jpg",
+            "045d53d92051eda96e4115f73a5931f1.jpg",
+            "45a4a47aaeeced3432e0869fb374f460.jpg",
+            "0779fbbf1a5dabc026973d22d2f65d15.jpg",
+            "9a9c65e17c65681a7a13c82c5b34c74b.jpg",
+            "9756fe9df5a80f0b13df9d2ab21c004f.jpg",
+            "24105fe10192cfc52f624c58ef8e283a.jpg",
+            "d27ebb6de481e23dafccc64d636e01bf.jpg",
+            "d152959aa5dc4a082583adb492487783.jpg",
+            "d680301f8ebe38135d680d401ffb99af.jpg",
+            "d31422000d3d05a1d6455fb6fbe90701.jpg",
+            "e10abac162cea08d51913e19fb39b385.jpg",
+            "eeef7a098569c99a42d8fc121c8c9de0.jpg",
+            "f79dd743d415167600d9e3f12a50f6bc.jpg",
+            "fb90cea01475b135418bf7c7882ed418.jpg",
+            "fd2297f1a92da0c67162514da4048328.jpg",
+        ];
+
+        const questions = {
+            felelsz: {
+                green: ["Zöld Felelsz 1", "Zöld Felelsz 2"],
+                yellow: ["Sárga Felelsz 1", "Sárga Felelsz 2"],
+                red: ["Piros Felelsz 1", "Piros Felelsz 2"]
+            },
+            merszek: {
+                green: ["Zöld Mersz 1", "Zöld Mersz 2"],
+                yellow: ["Sárga Mersz 1", "Sárga Mersz 2"],
+                red: ["Piros Mersz 1", "Piros Mersz 2"]
+            },
+            csokhazassag: {
+                green: ["Zöld Csók/Házasság/Halál 1", "Zöld Csók/Házasság/Halál 2"],
+                yellow: ["Sárga Csók/Házasság/Halál 1", "Sárga Csók/Házasság/Halál 2"],
+                red: ["Piros Csók/Házasság/Halál 1", "Piros Csók/Házasság/Halál 2"]
+            },
+            mostlikely: {
+                green: ["Zöld Most Likely 1", "Zöld Most Likely 2"],
+                yellow: ["Sárga Most Likely 1", "Sárga Most Likely 2"],
+                red: ["Piros Most Likely 1", "Piros Most Likely 2"]
+            },
+            inkabb: {
+                green: ["Zöld Inkább 1", "Zöld Inkább 2"],
+                yellow: ["Sárga Inkább 1", "Sárga Inkább 2"],
+                red: ["Piros Inkább 1", "Piros Inkább 2"]
+            },
+            mutasdmeg: {
+                green: ["Zöld Mutasd meg 1", "Zöld Mutasd meg 2"],
+                yellow: ["Sárga Mutasd meg 1", "Sárga Mutasd meg 2"],
+                red: ["Piros Mutasd meg 1", "Piros Mutasd meg 2"]
+            },
+             tortenelem: {
+                "Sopron": ["Mi volt Sopron fő nevezetessége?", "Mikor alapították Sopront?"],
+                "Kecskemét": ["Melyik híres szülöttje Kecskemétnek?", "Milyen nevezetességek vannak itt?"],
+                "Békéscsaba": ["Békéscsaba ismert eseményei?", "Mikor alapították a várost?"],
+                "Ady háza": ["Milyen emlékek kötődnek Ady házához?", "Mikor élt itt Ady Endre?"],
+                "Kulturothon Szatmar": ["Milyen programokat szerveznek?", "Mikor épült a kultúrotthon?"],
+                "A LER": ["Mikor alakult?", "Milyen rendezvények vannak itt?"],
+                "Form Coffee": ["Milyen híres a kávézó?", "Milyen programok zajlanak itt?"],
+                "Cartofiseria": ["Mi a jellegzetessége?", "Milyen eseményeket tartanak?"],
+                "Botanikuskert": ["Milyen növények találhatók?", "Mikor alapították?"],
+                "Vibe": ["Milyen rendezvények zajlanak itt?", "Milyen története van?"],
+                "Noémi haza": ["Ki élt itt?", "Milyen emlékek kapcsolódnak hozzá?"],
+                "Roland barlangja": ["Hol található?", "Mi a története?"],
+                "Aroma": ["Milyen rendezvények vannak?", "Mikor nyílt meg?"],
+                "Fogaras": ["Mi a város történelme?", "Melyik híres épület található itt?"],
+                "Pro Gym": ["Milyen eseményeket tartanak?", "Mikor nyílt a terem?"],
+                "Crinul": ["Milyen nevezetessége van?", "Milyen programok zajlanak itt?"],
+                "Fotér": ["Mi található a főtéren?", "Milyen történelmi események voltak?"],
+                "Kaufland": ["Mikor nyílt a bolt?", "Milyen történelmi érdekessége van?"],
+                "Royal": ["Milyen események zajlanak?", "Mikor épült a helyszín?"],
+                "Iskola": ["Mikor épült az iskola?", "Milyen történelmi személyiségek jártak ide?"],
+                "Liqiud": ["Milyen események zajlanak?", "Mi a története?"]
+            }
+        };
+
+        let hasFlipped = false;
+        let currentCategory = null;
+        let currentColor = null;
+        let currentLocation = null;
+
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function chooseCategory(category) {
+            currentCategory = category;
+            currentLocation = null;
+            const diffContainer = document.getElementById("difficulty-container");
+            const questionsContainer = document.getElementById("questions-container");
+            diffContainer.innerHTML = "";
+            questionsContainer.innerHTML = "";
+            hasFlipped = false;
+
+            const colors = [
+                { name: "green", color: "green" },
+                { name: "yellow", color: "gold" },
+                { name: "red", color: "red" }
+            ];
+
+            colors.forEach(c => {
+                const btn = document.createElement("button");
+                btn.className = "category-btn color-btn";
+                btn.style.backgroundColor = c.color;
+                btn.addEventListener("click", () => {
+                    currentColor = c.name;
+                    showQuestions();
+                });
+                diffContainer.appendChild(btn);
+            });
+        }
+
+        function showQuestions() {
+            const container = document.getElementById("questions-container");
+            container.innerHTML = "";
+            hasFlipped = false;
+
+            const usedImages = [];
+            while (usedImages.length < 6) {
+                const imgName = getRandomItem(cardImageNames);
+                if (!usedImages.includes(imgName)) usedImages.push(imgName);
+            }
+
+            usedImages.forEach(imgName => {
+                const card = document.createElement("div");
+                card.className = "card";
+
+                const front = document.createElement("div");
+                front.className = "front";
+                const img = document.createElement("img");
+                img.src = "images/" + imgName;
+                img.alt = "Kártya hátlap";
+                front.appendChild(img);
+
+                const back = document.createElement("div");
+                back.className = "back";
+
+                if (currentCategory === "tortenelem") {
+                    back.innerText = getRandomItem(questions[currentCategory][currentLocation]);
+                } else {
+                    back.innerText = getRandomItem(questions[currentCategory][currentColor]);
+                }
+
+                card.appendChild(front);
+                card.appendChild(back);
+
+                card.addEventListener("click", () => {
+                    if (!hasFlipped) {
+                        hasFlipped = true;
+                        card.classList.add("flipped");
+                        setTimeout(() => {
+                            card.classList.remove("flipped");
+                            showQuestions();
+                        }, 3000);
+                    }
+                });
+
+                container.appendChild(card);
+            });
+        }
+
+        function showTortenelemLocations() {
+            currentCategory = "tortenelem";
+            currentColor = null;
+            const container = document.getElementById("questions-container");
+            const diffContainer = document.getElementById("difficulty-container");
+            container.innerHTML = "";
+            diffContainer.innerHTML = "";
+
+            Object.keys(questions.tortenelem).forEach(location => {
+                const btn = document.createElement("button");
+                btn.className = "category-btn sub-category";
+                btn.innerText = location;
+                btn.addEventListener("click", () => {
+                    currentLocation = location;
+                    showQuestions();
+                });
+                container.appendChild(btn);
+            });
+        }
+    </script>
+</body>
+</html>
