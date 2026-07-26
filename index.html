@@ -100,7 +100,6 @@
             }
         };
 
-        let hasFlipped = false;
         let currentCategory = null;
         let currentColor = null;
         let currentLocation = null;
@@ -116,7 +115,6 @@
             const questionsContainer = document.getElementById("questions-container");
             diffContainer.innerHTML = "";
             questionsContainer.innerHTML = "";
-            hasFlipped = false;
 
             const colors = [
                 { name: "green", color: "green" },
@@ -139,7 +137,6 @@
         function showQuestions() {
             const container = document.getElementById("questions-container");
             container.innerHTML = "";
-            hasFlipped = false;
 
             const usedImages = [];
             while (usedImages.length < 6) {
@@ -171,15 +168,19 @@
                 card.appendChild(back);
 
                 card.addEventListener("click", () => {
-                    if (!hasFlipped) {
-                        hasFlipped = true;
-                        card.classList.add("flipped");
-                        setTimeout(() => {
-                            card.classList.remove("flipped");
-                            showQuestions();
-                        }, 3000);
-                    }
-                });
+
+    // Ha van már megfordított kártya,
+    // fordítsuk vissza.
+    document.querySelectorAll(".card.flipped").forEach(c => {
+        if (c !== card) {
+            c.classList.remove("flipped");
+        }
+    });
+
+    // Az aktuális kártya megfordul.
+    card.classList.toggle("flipped");
+
+});
 
                 container.appendChild(card);
             });
